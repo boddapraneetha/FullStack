@@ -1,0 +1,15 @@
+const express = require('express');
+const router = express.Router();
+const Internship = require('../models/Internship');
+
+router.post('/apply', async (req, res) => {
+  try {
+    const newApp = new Internship(req.body);
+    await newApp.save();
+    res.status(200).json({ message: 'Application received' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+module.exports = router;
