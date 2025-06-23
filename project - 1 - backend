@@ -1,0 +1,31 @@
+from flask import Flask, request, jsonify
+import math
+
+app = Flask(__name__)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+# Enable CORS if frontend and backend are on different ports
+from flask_cors import CORS
+CORS(app)
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    try:
+        data = request.get_json()
+        expression = data.get('expression')
+
+        # Basic safe eval: limit scope
+        result = eval(expression, {"__builtins__": None}, {
+            "abs": abs,
+            "round": round,
+            "math": math
+        })
+
+        return jsonify({'result': result})
+    except ZeroDivisionError:
+        return jsonify({'error': 'Cannot divide by zero'}), 400
+    except Exception as e:
+        return jsonify({'error': 'Invalid Expression'}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)
